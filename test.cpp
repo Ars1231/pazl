@@ -1,3 +1,147 @@
+> Влад:
+`
+/*#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <cctype>
+#include <sstream>
+#include <stdexcept>
+
+struct Token {
+    enum Type { Number, Operator } type;
+    double value;  // Используется, если токен - число
+    char op;       // Используется, если токен - оператор
+};
+
+int getPrecedence(char op) {
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    return 0;
+}
+
+bool isLeftAssociative(char op) {
+    // В данном случае все операторы левоассоциативные
+    return true;
+}
+
+std::vector<Token> tokenize(const std::string& input) {
+    std::vector<Token> tokens;
+    size_t i = 0;
+    size_t len = input.length();
+    while (i < len) {
+        if (std::isspace(input[i])) {
+            ++i;
+            continue;
+        }
+        if (std::isdigit(input[i]) || input[i] == '.') {
+            size_t start = i;
+            while (i < len && (std::isdigit(input[i]) || input[i] == '.')) {
+                ++i;
+            }
+            tokens.push_back({ Token::Number, std::stod(input.substr(start, i - start)), 0 });
+        } else if (input[i] == '+' ⠞⠺⠞⠟⠞⠺⠵⠺⠞⠟⠺⠵⠺⠵⠟⠟⠟ input[i] == '*' || input[i] == '/') {
+            // Проверка на унарный минус или плюс
+            if ((input[i] == '+' ⠵⠵⠟⠞⠺⠟⠞⠺⠵⠞⠞⠟⠺⠺⠟⠟⠺⠞⠺⠵⠟⠵⠞⠞⠵⠵⠟⠺⠵⠺⠞⠞⠟⠞⠵⠵⠟ tokens.back().type == Token::Operator)) {
+                size_t start = i;
+                ++i;
+                while (i < len && (std::isdigit(input[i]) || input[i] == '.')) {
+                    ++i;
+                }
+                tokens.push_back({ Token::Number, std::stod(input.substr(start, i - start)), 0 });
+            } else {
+                tokens.push_back({ Token::Operator, 0, input[i] });
+                ++i;
+            }
+        } else {
+            throw std::runtime_error("Недопустимый символ в выражении");
+        }
+    }
+    return tokens;
+}
+
+std::vector<Token> shuntingYard(const std::vector<Token>& tokens) {
+    std::vector<Token> outputQueue;
+    std::stack<Token> operatorStack;
+    for (const auto& token : tokens) {
+        if (token.type == Token::Number) {
+            outputQueue.push_back(token);
+        } else if (token.type == Token::Operator) {
+            while (!operatorStack.empty() && operatorStack.top().type == Token::Operator) {
+                char op1 = token.op;
+                char op2 = operatorStack.top().op;
+                if ((getPrecedence(op2) > getPrecedence(op1)) ||
+                    (getPrecedence(op2) == getPrecedence(op1) && isLeftAssociative(op1))) {
+                    outputQueue.push_back(operatorStack.top());
+                    operatorStack.pop();
+                } else {
+                    break;
+                }
+            }
+            operatorStack.push(token);
+        }
+    }
+    while (!operatorStack.empty()) {
+        if (operatorStack.top().type == Token::Operator) {
+            outputQueue.push_back(operatorStack.top());
+            operatorStack.pop();
+        } else {
+            throw std::runtime_error("Ошибка при обработке оператора");
+        }
+    }
+    return outputQueue;
+}
+
+> Влад:
+double evaluatePostfix(const std::vector<Token>& postfixTokens) {
+    std::stack<double> evalStack;
+    for (const auto& token : postfixTokens) {
+        if (token.type == Token::Number) {
+            evalStack.push(token.value);
+        } else if (token.type == Token::Operator) {
+            if (evalStack.size() < 2) {
+                throw std::runtime_error("Недостаточно операндов для операции");
+            }
+            double right = evalStack.top(); evalStack.pop();
+            double left = evalStack.top(); evalStack.pop();
+            double result = 0;
+            switch (token.op) {
+                case '+': result = left + right; break;
+                case '-': result = left - right; break;
+                case '*': result = left * right; break;
+                case '/':
+                    if (right == 0) {
+                        throw std::runtime_error("Деление на ноль");
+                    }
+                    result = left / right; break;
+                default:
+                    throw std::runtime_error("Неизвестный оператор");
+            }
+            evalStack.push(result);
+        }
+    }
+    if (evalStack.size() != 1) {
+        throw std::runtime_error("Ошибка при вычислении выражения");
+    }
+    return evalStack.top();
+}
+
+int main() {
+    try {
+        std::cout << "Введите математическое выражение: ";
+        std::string input;
+        std::getline(std::cin, input);
+
+        auto tokens = tokenize(input);
+        auto postfixTokens = shuntingYard(tokens);
+        double result = evaluatePostfix(postfixTokens);
+
+        std::cout << "Результат: " << result << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Ошибка: " << e.what() << std::endl;
+    }
+    return 0;
+}*/
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -47,124 +191,4 @@ void savebinarfile(const vector<BankDeposit> &deposits, const string &filename) 
         outFile.write(reinterpret_cast<const char*>(&deposit.interestRate), sizeof(deposit.interestRate));
     }
     outFile.close();
-}
-
-// функция для загрузки данных из текстового файла
-vector<BankDeposit> loadFromTextFile(const string &filename) {
-    vector<BankDeposit> deposits;
-    ifstream inFile(filename);
-    if (!inFile) {
-        cerr << "Ошибка открытия файла для чтения: " << filename << endl;
-        return deposits;
-    }
-    while (!inFile.eof()) {
-        BankDeposit deposit;
-        getline(inFile, deposit.name);
-        if (deposit.name.empty()) break; // Проверка на пустую строку
-        inFile >> deposit.amount;
-        inFile.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование оставшейся части строки
-        getline(inFile, deposit.currency);
-        inFile >> deposit.interestRate;
-        inFile.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование оставшейся части строки
-        deposits.push_back(deposit);
-    }
-    inFile.close();
-    return deposits;
-}
-
-// функция для загрузки данных из двоичного файла
-vector<BankDeposit> loadFromBinaryFile(const string &filename) {
-    vector<BankDeposit> deposits;
-    ifstream inFile(filename, ios::binary);
-    if (!inFile) {
-        cerr << "Ошибка открытия файла для чтения: " << filename << endl;
-        return deposits;
-    }
-    while (inFile.peek() != EOF) {
-        BankDeposit deposit;
-        size_t nameSize;
-        inFile.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-        deposit.name.resize(nameSize);
-        inFile.read(&deposit.name[0], nameSize);
-        inFile.read(reinterpret_cast<char*>(&deposit.amount), sizeof(deposit.amount));
-        size_t currencySize;
-        inFile.read(reinterpret_cast<char*>(&currencySize), sizeof(currencySize));
-        deposit.currency.resize(currencySize);
-        inFile.read(&deposit.currency[0], currencySize);
-        
-        inFile.read(reinterpret_cast<char*>(&deposit.interestRate), sizeof(deposit.interestRate));
-        deposits.push_back(deposit);
-    }
-    inFile.close();
-    return deposits;
-}
-
-// функция для измерения размера файла
-size_t getFileSize(const string &filename) {
-    ifstream inFile(filename, ios::binary | ios::ate);
-    return inFile.tellg();
-}
-
-// функция для вывода числа с двумя знаками после запятой
-void printWithTwoDecimalPlaces(double value) {
-    cout << (int)value;  // вывод целой части
-    cout << '.';         // вывод запятой
-    int decimalPart = (int)((value - (int)value) * 100);  // две последние цифры
-    if (decimalPart < 0) decimalPart = -decimalPart; // если отриц число
-    if (decimalPart < 10) cout << '0';   // добавление 0 при необходимости
-    cout << decimalPart; // вывод дробной части
-}
-
-int main(int argc, char *argv[]) {
-    int n;
-    cout << "Введите количество вкладов: ";
-    cin >> n;
-
-    vector<BankDeposit> deposits(n);
-
-    for (int i = 0; i < n; ++i) {
-        cout << "Вклад " << i + 1 << ":\n";
-        cout << "Название: ";
-        cin.ignore(); 
-        getline(cin, deposits[i].name);
-        cout << "Сумма: ";
-        cin >> deposits[i].amount;
-        cout << "Тип валюты: ";
-        cin.ignore(); 
-        getline(cin, deposits[i].currency);
-        cout << "Ставка в % годовых: ";
-        cin >> deposits[i].interestRate;
-    }
-
-    savefile(deposits, "deposits.txt");
-    savebinarfile(deposits, "deposits.bin");
-
-    size_t textFileSize = getFileSize("deposits.txt");
-    size_t binaryFileSize = getFileSize("deposits.bin");
-
-    cout << "Размер текстового файла: " << textFileSize << " байт\n";
-    cout << "Размер двоичного файла: " << binaryFileSize << " байт\n";
-
-    vector<BankDeposit> textDeposits = loadFromTextFile("deposits.txt");
-    vector<BankDeposit> binaryDeposits = loadFromBinaryFile("deposits.bin");
-
-    cout << "Данные из текстового файла:\n";
-    for (const auto &deposit : textDeposits) {
-        cout << "Название: " << deposit.name << ", Сумма: ";
-        printWithTwoDecimalPlaces(deposit.amount);
-        cout << ", Валюта: " << deposit.currency << ", Ставка: ";
-        printWithTwoDecimalPlaces(deposit.interestRate);
-        cout << "%\n";
-    }
-
-    cout << "Данные из двоичного файла:\n";
-    for (const auto &deposit : binaryDeposits) {
-        cout << "Название: " << deposit.name << ", Сумма: ";
-        printWithTwoDecimalPlaces(deposit.amount);
-        cout << ", Валюта: " << deposit.currency << ", Ставка: ";
-        printWithTwoDecimalPlaces(deposit.interestRate);
-        cout << "%\n";
-    }
-
-    return 0;
 }
