@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
     vector<BankDeposit> textDeposits = loadFromTextFile("deposits.txt");
     vector<BankDeposit> binaryDeposits = loadFromBinaryFile("deposits.bin");
 
-    cout << "\n Данные из текстового файла:\n";
+    cout << "Данные из текстового файла:\n";
     for (const auto &deposit : textDeposits) {
         cout << "Название: " << deposit.name << ", Сумма: ";
         printWithTwoDecimalPlaces(deposit.amount);
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
         cout << "%\n";
     }
 
-    cout << "\n Данные из двоичного файла:\n";
+    cout << "Данные из двоичного файла:\n";
     for (const auto &deposit : binaryDeposits) {
         cout << "Название: " << deposit.name << ", Сумма: ";
         printWithTwoDecimalPlaces(deposit.amount);
